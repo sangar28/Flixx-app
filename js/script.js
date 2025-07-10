@@ -1,4 +1,3 @@
-
 const global = {
   currentPage: window.location.pathname,
   search: {
@@ -6,6 +5,7 @@ const global = {
     term: "",
     page: 1,
     totalPages: 1,
+    totalResults: 0,
   },
   api: {
     apiKey: "12edb22d4ab1458b8614fa6424e5543b",
@@ -15,7 +15,7 @@ const global = {
 
 // display popular movies
 async function displayPopularMovies() {
-  const { results } = await fetchApi("movie/popular");
+  const { results, page, total_results } = await fetchApi("movie/popular");
 
   results.forEach((movie) => {
     const div = document.createElement("div");
@@ -38,11 +38,12 @@ async function displayPopularMovies() {
 
     document.querySelector("#popular-movies").appendChild(div);
   });
+  
 }
 
 // display popular tv shows
 async function displayPopularTvshows() {
-  const { results } = await fetchApi("tv/popular");
+  const { results, page, total_results } = await fetchApi("tv/popular");
 
   results.forEach((show) => {
     const div = document.createElement("div");
@@ -212,11 +213,14 @@ async function search() {
   const urlParams = new URLSearchParams(queryString);
 
   global.search.type = urlParams.get("type");
-  console.log(global.search.type);
   global.search.term = urlParams.get("search-term");
 
   if (global.search.term !== "" && global.search.term !== null) {
-    const { results, total_pages, page } = await searchApi();
+    const { results, total_pages, page, total_results } = await searchApi();
+
+    global.search.page = page;
+    global.search.totalPages = total_pages;
+    global.search.totalResults = total_results;
 
     if (results.length === 0) {
       showAlert("No Resluts Found");
@@ -229,7 +233,12 @@ async function search() {
   }
 }
 
+// display search results
 function displaySearchResults(results) {
+  // clear before display results
+  document.querySelector("#search-results").innerHTML = "";
+  document.querySelector("#search-result-heading").innerHTML = "";
+  document.querySelector("#pagination").innerHTML = "";
   results.forEach((result) => {
     const div = document.createElement("div");
     div.classList.add("card");
@@ -260,8 +269,49 @@ function displaySearchResults(results) {
             }
           </div>
         `;
+    document.querySelector("#search-result-heading").innerHTML = `
+    <h2>${results.length} Of ${global.search.totalResults} Results for ${global.search.term}</h2>
+    `;
 
     document.querySelector("#search-results").appendChild(div);
+  });
+  displayPagination();
+}
+
+//pagination
+function displayPagination() {
+  const div = document.createElement("div");
+  div.classList.add("pagination");
+  div.innerHTML = `
+  <button class="btn btn-primary" id="prev">Prev</button>
+  <button class="btn btn-primary" id="next">Next</button>
+  <div class="page-counter">${global.search.page} of ${global.search.totalPages}</div>
+  `;
+
+  document.querySelector("#pagination").appendChild(div);
+
+  // disable prev on first page
+  if (global.search.page === 1) {
+    const bg = (document.querySelector("#prev").style.display = "none");
+  }
+
+  // disable next on last page
+  if (global.search.page === global.search.totalPages) {
+    document.querySelector("#next").style.display = "none";
+  }
+
+  // next page
+  document.querySelector("#next").addEventListener("click", async () => {
+    global.search.page++;
+    const { results, total_pages } = await searchApi();
+    displaySearchResults(results);
+  });
+
+  // prev page
+  document.querySelector("#prev").addEventListener("click", async () => {
+    global.search.page--;
+    const { results, total_pages } = await searchApi();
+    displaySearchResults(results);
   });
 }
 
@@ -286,28 +336,28 @@ async function displaySlider() {
   });
 }
 
-function initSwiper(){
-  const swiper = new Swiper('.swiper' , {
-    slidesPerView:1,
-    spaceBetween:30,
-    freeMode:true,
-    loop:true,
-    autoplay:{
-      delay:4000,
-      disableOnInteraction:false,
+function initSwiper() {
+  const swiper = new Swiper(".swiper", {
+    slidesPerView: 1,
+    spaceBetween: 30,
+    freeMode: true,
+    loop: true,
+    autoplay: {
+      delay: 4000,
+      disableOnInteraction: false,
     },
-    breakpoints:{
-      500:{
-        slidesPerView:2,
+    breakpoints: {
+      500: {
+        slidesPerView: 2,
       },
-      700:{
-        slidesPerView:3,
+      700: {
+        slidesPerView: 3,
       },
-      1200:{
-        slidesPerView:4,
-      }
-    }
-  })
+      1200: {
+        slidesPerView: 4,
+      },
+    },
+  });
 }
 
 // fetch from TMDB api
@@ -317,7 +367,9 @@ async function fetchApi(endpoint) {
 
   showSpinner();
 
-  const response = await fetch(`${api_url}/${endpoint}?api_key=${api_key}`);
+  const response = await fetch(
+    `${api_url}/${endpoint}?api_key=${api_key}&page=${global.search.page}`
+  );
   const data = response.json();
 
   hideSpinner();
@@ -333,7 +385,7 @@ async function searchApi() {
   showSpinner();
 
   const response = await fetch(
-    `${api_url}/search/${global.search.type}?api_key=${api_key}&query=${global.search.term}`
+    `${api_url}/search/${global.search.type}?api_key=${api_key}&query=${global.search.term}&page=${global.search.page}`
   );
   const data = response.json();
 
@@ -343,7 +395,6 @@ async function searchApi() {
 }
 
 // spinner
-
 function showSpinner() {
   document.querySelector(".spinner").classList.add("show");
 }
@@ -403,6 +454,16 @@ function init() {
       break;
   }
   higlightActiveLink();
+
+  window.addEventListener("scroll", function () {
+    const navbar = document.querySelector(".main-header");
+
+    if (window.scrollY > 0) {
+      navbar.classList.add("header-scroll");
+    } else {
+      navbar.classList.remove("header-scroll");
+    }
+  });
 }
 
 document.addEventListener("DOMContentLoaded", init);
