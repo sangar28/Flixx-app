@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flixx</title>
+
+  <!-- google fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+    rel="stylesheet">
+
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/spinner.css">
+  <link rel="stylesheet" href="lib/fontawesome.css">
+  <link rel="stylesheet" href="lib/swiper.css">
+
+  <script src="js/script.js"></script>
+  <script src="lib/swiper.js"></script>
+</head>
+
+<body>
+  <header class="main-header">
+    <div class="container">
+      <div class="header">
+        <a href="/">
+          <div class="logo">FLIXX</div>
+        </a>
+        <nav>
+          <ul>
+            <li>
+              <a href="/" class="nav-links">Movies</a>
+            </li>
+            <li>
+              <a href="/shows.html" class="nav-links">TV shows</a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+
+  <!-- search movies -->
+  <section class="search">
+    <div class="container">
+      <div id="alert"></div>
+      <form action="/search.html" class="search-form">
+        <input type="radio" name="type" id="movie" value="movie" checked>
+        <label for="movie">Movies</label>
+        <input type="radio" name="type" id="tv" value="tv">
+        <label for="tv">TV shows</label>
+        <div class="search-flex">
+          <input type="text" name="search-term" id="search-term" placeholder="Enter the term">
+          <button type="submit" class="btn">
+            <i class="fas fa-search"></i>
+          </button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- search result -->
+  <section class="container" id="search-wrapper-result">
+    <heading id="search-result-heading" class="search-result-heading"></heading>
+    <div id="search-results" class="grid"></div>
+    <div id="pagination"></div>
+
+  </section>
+
+  <!-- footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="logo">FLIXX</div>
+      <div class="social-links">
+        <a href="https://www.facebook.com" target="-blank"><i class="fab fa-facebook-f"></i></a>
+        <a href="https://www.twitter.com" target="-blank"><i class="fab fa-twitter"></i></a>
+        <a href="https://www.instagram.com" target="-blank"><i class="fab fa-instagram"></i></a>
+      </div>
+    </div>
+  </footer>
+  <div class="spinner"></div>
+</body>
